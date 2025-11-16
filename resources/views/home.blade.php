@@ -5,7 +5,7 @@
             <div class="d-flex">
                 <div class="align-self-center">
                     <a href="{{ route('setting') }}">
-                        <img src="{{ Auth::user()->profile->avatar_url ?? '/mobile/images/avatars/2m.png' }}"
+                        <img src="{{ Auth::user()->profile->avatar_url }}"
                             class="rounded-circle" width="43">
                     </a>
                 </div>

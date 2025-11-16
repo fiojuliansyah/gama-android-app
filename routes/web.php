@@ -98,9 +98,10 @@ Route::middleware('auth')->prefix('mobile')->group(function () {
 
     Route::post('/patroll/start', [PatrollController::class, 'startSession'])->name('patroll.start');
 
-    Route::post('/patroll/store', [PatrollController::class, 'store'])->name('patroll.store');
-
     Route::get('/patroll/end-session/{session}', [PatrollController::class, 'endSession'])
         ->name('patroll.end-session');
+
+    Route::get('/floor/{id}/patroll', [PatrollController::class, 'detailFloor'])->name('patroll.floor.detail');
+    Route::post('/task-progress/{task}/update', [PatrollController::class, 'taskUpdate'])->name('patroll.task-progress.update');
 
 });
