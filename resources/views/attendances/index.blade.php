@@ -72,94 +72,70 @@
 @push('js')
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    var siteLat = {{ Auth::user()->site->lat ?? 0 }};
-    var siteLong = {{ Auth::user()->site->long ?? 0 }};
-    var radius = {{ Auth::user()->site->radius ?? 5 }};
-    var clockButton = document.getElementById('clockButton');
-    var userDepartment = {{ Auth::user()->department_id }};
+    document.addEventListener("DOMContentLoaded", function () {
+        var siteLat = {{ Auth::user()->site->lat ?? 0 }};
+        var siteLong = {{ Auth::user()->site->long ?? 0 }};
+        var radius = {{ Auth::user()->site->radius ?? 5 }};
+        var clockButton = document.getElementById('clockButton');
+        var userDepartment = {{ Auth::user()->department_id }};
 
-    var map = L.map('map', {
-        zoomControl: false
-    }).setView([siteLat, siteLong], 18);
+        var map = L.map('map', {
+            zoomControl: false
+        }).setView([siteLat, siteLong], 18);
 
-    // Gunakan OpenStreetMap tiles (lebih stabil)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Custom icon marker
-    var userMarker = null;
-    var siteCircle = null;
-    var defaultIconUrl = 'https://img.icons8.com/?size=256&id=13783&format=png';
-    var mobileIconUrl = 'https://img.icons8.com/?size=256&id=114446&format=png';
-
-    // Panggil map.invalidateSize() supaya Leaflet tahu ukuran div
-    setTimeout(function() { map.invalidateSize(); }, 100);
-
-    function updateLocation(lat, lng) {
-        if (userMarker) map.removeLayer(userMarker);
-        if (siteCircle) map.removeLayer(siteCircle);
-
-        var iconUrl = (userDepartment == 2) ? mobileIconUrl : defaultIconUrl;
+        L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        }).addTo(map);
 
         var customIcon = L.icon({
-            iconUrl: iconUrl,
-            iconSize: [48, 48],
-            iconAnchor: [24, 48],
-            popupAnchor: [0, -48]
+            iconUrl: 'https://img.icons8.com/?size=256&id=13783&format=png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
         });
 
-        userMarker = L.marker([lat, lng], { icon: customIcon })
-            .addTo(map)
-            .bindPopup(userDepartment == 2 ? "Status absensi bisa di mana saja" : "Pastikan anda dalam radius absen!")
-            .openPopup();
-
-        if (userDepartment != 2) {
-            siteCircle = L.circle([siteLat, siteLong], {
-                color: 'red',
-                fillColor: 'red',
-                fillOpacity: 0.2,
-                radius: radius
-            }).addTo(map);
-
-            // Hitung jarak ke site
-            var distance = map.distance([lat, lng], [siteLat, siteLong]);
-            clockButton.style.display = (distance <= radius) ? 'block' : 'none';
-        } else {
-            clockButton.style.display = 'block';
+        function onLocationFound(e) {
+            var userLat = e.latlng.lat;
+            var userLong = e.latlng.lng;
+            
+            L.marker([userLat, userLong], { icon: customIcon }).addTo(map)
+                .bindPopup("<b>Lokasi Anda</b>").openPopup();
+            
+            if (userDepartment == 2) {
+                clockButton.style.display = 'block';
+            } else {
+                var distance = map.distance([userLat, userLong], [siteLat, siteLong]);
+                if (distance <= radius) {
+                    clockButton.style.display = 'block';
+                    L.circle([siteLat, siteLong], {
+                        color: 'red',
+                        fillColor: 'red',
+                        fillOpacity: 0.2,
+                        radius: radius
+                    }).addTo(map);
+                } else {
+                    clockButton.style.display = 'none';
+                }
+            }
         }
 
-        map.setView([lat, lng], 18);
-    }
+        function onLocationError(e) {
+            alert("Lokasi tidak dapat ditemukan: " + e.message);
+        }
 
-    function onLocationFound(e) {
-        updateLocation(e.latitude, e.longitude);
-    }
+        map.locate({ setView: true, maxZoom: 18, watch: true });
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
 
-    function onLocationError(e) {
-        alert("Lokasi tidak dapat ditemukan: " + e.message);
-        clockButton.style.display = 'none';
-    }
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            updateLocation(position.coords.latitude, position.coords.longitude);
-        }, function(err) {
-            console.warn(err);
-            clockButton.style.display = 'none';
-        });
-    }
-
-    // Tombol refresh map
-    document.getElementById('refreshMapBtn').addEventListener('click', function() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                updateLocation(position.coords.latitude, position.coords.longitude);
+        document.getElementById('refreshMapBtn').addEventListener('click', function() {
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker || layer instanceof L.Circle) {
+                    map.removeLayer(layer);
+                }
             });
-        }
+            
+            map.locate({ setView: true, maxZoom: 18 });
+        });
     });
-});
 </script>
-
 @endpush
