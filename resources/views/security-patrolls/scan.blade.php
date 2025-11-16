@@ -2,7 +2,7 @@
 
 @section('content')
 
-<a href="#" class="btn-back">
+<a href="{{ route('patroll.index') }}" class="btn-back">
     <i class="fas fa-arrow-left"></i>
 </a>
 
