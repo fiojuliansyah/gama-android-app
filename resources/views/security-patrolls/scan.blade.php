@@ -45,76 +45,33 @@
 
 @push('css')
 <style>
-    #reader {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10;
-    }
-    #reader video {
-        height: 100vh;
-        pointer-events: none !important;
-    }
+    #reader { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 10; }
+    #reader video { height: 100vh; pointer-events: none !important; }
     .qr-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 20;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background: linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 0.5) 0%,
-            rgba(0, 0, 0, 0.2) 20%,
-            rgba(0, 0, 0, 0.1) 60%,
-            rgba(0, 0, 0, 0.3) 100%
+        position: fixed; inset: 0; z-index: 20; padding: 20px;
+        display: flex; flex-direction: column; justify-content: space-between;
+        background: linear-gradient(to bottom,
+            rgba(0,0,0,0.5) 0%,
+            rgba(0,0,0,0.2) 20%,
+            rgba(0,0,0,0.1) 60%,
+            rgba(0,0,0,0.3) 100%
         );
     }
-    .qr-header {
-        text-align: center;
-        color: #fff;
-        font-size: 20px;
-        font-weight: bold;
-    }
-    .qr-footer {
-        text-align: center;
-        color: #fff;
-        font-size: 16px;
-        margin-bottom: 20px;
-    }
+    .qr-header { text-align: center; color: #fff; font-size: 20px; font-weight: bold; }
+    .qr-footer { text-align: center; color: #fff; font-size: 16px; margin-bottom: 20px; }
     .qr-result {
-        width: 300px;
-        display: inline-block;
-        padding: 10px 15px;
-        font-size: 13px;
-        border-radius: 8px;
-        background-color: rgba(0, 0, 0, 0.6);
+        width: 300px; display: inline-block; padding: 10px 15px; font-size: 13px;
+        border-radius: 8px; background-color: rgba(0,0,0,0.6);
     }
     .btn-back {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        width: 40px;
-        height: 40px;
-        z-index: 30;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #fff;
-        border-radius: 50%;
-        text-decoration: none;
-        background: rgba(0, 0, 0, 0.5);
+        position: absolute; top: 15px; left: 15px; width: 40px; height: 40px;
+        z-index: 30; display: flex; justify-content: center; align-items: center;
+        color: #fff; border-radius: 50%; text-decoration: none;
+        background: rgba(0,0,0,0.5);
     }
     .end-session-wrapper {
-        position: fixed;
-        bottom: 30px;
-        left: 0;
-        right: 0;
-        z-index: 9999999;
-        display: flex;
-        justify-content: center;
+        position: fixed; bottom: 30px; left: 0; right: 0;
+        z-index: 9999999; display: flex; justify-content: center;
     }
 </style>
 @endpush
@@ -123,7 +80,6 @@
 @if ($sessionToday && !$sessionToday->end_time)
 <script src="https://unpkg.com/html5-qrcode"></script>
 
-<!-- BEEP sound -->
 <audio id="beep-sound">
     <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" type="audio/ogg">
 </audio>
@@ -131,13 +87,13 @@
 <script>
     let scanner;
     let beep = document.getElementById("beep-sound");
+    let scanned = false; // mencegah double redirect
 
     document.addEventListener("DOMContentLoaded", async function () {
         scanner = new Html5Qrcode("reader");
 
         try {
             const cameras = await Html5Qrcode.getCameras();
-
             if (!cameras.length) {
                 document.getElementById("result").innerText = "Tidak ada kamera ditemukan";
                 return;
@@ -152,9 +108,17 @@
                 { deviceId: cam.id },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 text => {
-                    beep.play(); // 🔊 BEEP SOUND
+                    if (scanned) return;
+                    scanned = true;
+
+                    beep.play();
+
                     document.getElementById("result").innerText = text;
                     document.getElementById("result-input").value = text;
+
+                    setTimeout(() => {
+                        window.location.href = text;
+                    }, 300); // sedikit delay setelah beep
                 }
             );
 
