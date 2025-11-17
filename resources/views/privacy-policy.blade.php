@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="header header-fixed header-logo-center">
-    <a href="index.html" class="header-title">Privacy Policy</a>
+    <a href="#" class="header-title">Privacy Policy</a>
+    <a href="{{ route('login') }}" class="header-icon header-icon-1">
+        <i class="fas fa-arrow-left"></i>
+    </a>
 </div>
 <div class="page-content pt-5">
 

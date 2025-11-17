@@ -34,12 +34,19 @@
             </div>
         </form>
 
-        <a href="#" id="login-btn" onclick="submitForm();" class="btn btn-m mt-4 mb-4 btn-full bg-highlight rounded-sm text-uppercase font-900">Login</a>
+        <a href="#" id="login-btn" onclick="submitForm();" class="btn btn-m mt-4 mb-2 btn-full bg-highlight rounded-sm text-uppercase font-900">Login</a>
+
+        <!-- Privacy Policy Link -->
+        <div class="mt-2">
+            <a href="{{ route('privacy-policy') }}" class="font-12 color-blue-dark">Privacy Policy / Kebijakan Privasi</a>
+        </div>
     </div>
+
     <div id="loader" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30;">
         <div class="spinner" style="border: 8px solid #f3f3f3; border-top: 8px solid #020EBD; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
     </div>
 </div>
+
 <style>
     @keyframes spin {
         0% { transform: rotate(0deg); }
