@@ -111,6 +111,11 @@ class HomeController extends Controller
         return view('walkthrough');
     }
 
+    public function download()
+    {
+        return view('download');
+    }
+
     public function logs(Request $request)
     {
         $userId = Auth::id();

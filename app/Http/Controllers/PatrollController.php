@@ -78,17 +78,24 @@ class PatrollController extends Controller
     {
         $user = Auth::user();
 
+        $lastSession = PatrollSession::where('user_id', $user->id)
+                        ->whereDate('date', today())
+                        ->latest('turn')
+                        ->first();
+
+        $turn = $lastSession ? $lastSession->turn + 1 : 1;
+
         $session = PatrollSession::create([
             'user_id'       => $user->id,
             'site_id'       => $user->site_id,
             'patroll_code'  => 'PAT-' . strtoupper(uniqid()),
             'date'          => today(),
             'start_time'    => now(),
-            'turn'          => 1
+            'turn'          => $turn
         ]);
 
         return redirect()->route('patroll.scan')
-            ->with('success', 'Sesi patroli dimulai.');
+            ->with('success', 'Sesi patroli dimulai. Turn ke-' . $turn);
     }
 
     public function endSession($id)
@@ -142,6 +149,7 @@ class PatrollController extends Controller
             [
                 'task_planner_id' => $task->id,
                 'user_id' => Auth::id(),
+                'patroll_session_id' => $request->patroll_session_id,
             ],
             $data
         );

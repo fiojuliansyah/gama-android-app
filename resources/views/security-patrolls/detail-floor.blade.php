@@ -26,7 +26,10 @@
             <ul class="list-group mb-3">
                 @foreach ($taskPlanners as $task)
                     @php
-                        $progress = $task->patrollProgresses()->where('status', 'reported')->first();
+                        $progress = $task->patrollProgresses()
+                                        ->where('status', 'reported')
+                                        ->where('patroll_session_id', $currentSession->id ?? 0)
+                                        ->first();
                     @endphp
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
