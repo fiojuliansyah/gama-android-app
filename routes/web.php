@@ -17,6 +17,7 @@ use App\Http\Controllers\FindingsReportController;
 use App\Http\Controllers\FaceRecognitionController;
 
 Route::get('/download', [HomeController::class, 'download'])->name('download');
+Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('privacy-policy');
 
 Route::prefix('mobile')->group(function() {
     Route::get('/get-started', [HomeController::class, 'getStarted'])->name('walkthrough');

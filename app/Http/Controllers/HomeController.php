@@ -116,6 +116,11 @@ class HomeController extends Controller
         return view('download');
     }
 
+    public function privacyPolicy()
+    {
+        return view('privacy-policy');
+    }
+
     public function logs(Request $request)
     {
         $userId = Auth::id();
