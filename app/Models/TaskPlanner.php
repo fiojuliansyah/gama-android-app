@@ -30,4 +30,14 @@ class TaskPlanner extends Model
     {
         return $this->belongsTo(Floor::class, 'floor_id');
     }
+
+    public function progresses()
+    {
+        return $this->hasMany(TaskProgress::class);
+    }
+
+    public function patrollProgresses()
+    {
+        return $this->hasMany(SecurityPatroll::class);
+    }
 }

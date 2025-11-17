@@ -106,4 +106,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserNotification::class);
     }
+
+     public function patrollSessions()
+    {
+        return $this->hasMany(PatrollSession::class);
+    }
 }

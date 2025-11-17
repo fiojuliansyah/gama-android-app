@@ -12,6 +12,7 @@ class PatrollSession extends Model
     {
         return $this->hasMany(SecurityPatroll::class);
     }
+    
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -10,6 +10,7 @@
             <i class="fas fa-arrow-left"></i>
         </a>
     </div>
+    <br><br>
 
     <div class="content mt-5">
         <h4 class="font-700 mb-1">{{ $floor->name ?? 'Floor' }}</h4>
@@ -24,22 +25,23 @@
         @else
             <ul class="list-group mb-3">
                 @foreach ($taskPlanners as $task)
+                    @php
+                        $progress = $task->patrollProgresses()->where('status', 'reported')->first();
+                    @endphp
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <strong>{{ $task->name ?? '-' }}</strong><br>
                             <small>{{ $task->service_type ?? '-' }} / {{ $task->work_type ?? '-' }}</small>
                         </div>
                         <div class="d-flex gap-2">
-                            <span class="badge bg-gray-dark">
-                                Floor: {{ $floor->name ?? '-' }}
-                            </span>
+                            @if ($progress)
+                                <button type="button" class="btn btn-sm btn-success" disabled>Completed</button>
+                            @else
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#progressModal{{ $task->id }}">
+                                    Update Progress
+                                </button>
+                            @endif
 
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#progressModal{{ $task->id }}">
-                                Update Progress
-                            </button>
-
-                            <!-- Modal -->
                             <div class="modal fade" id="progressModal{{ $task->id }}" tabindex="-1" aria-labelledby="progressModalLabel{{ $task->id }}" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -50,18 +52,14 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
+                                                <input type="hidden" name="patroll_session_id" value="{{ $currentSession->id }}">
                                                 <div class="mb-2">
                                                     <label class="form-label">Progress Description</label>
                                                     <textarea class="form-control" name="progress_description" rows="2"></textarea>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <label class="form-label">Image Before</label>
-                                                    <input type="file" class="form-control" name="image_before" accept="image/*" capture="environment">
-                                                </div>
-
-                                                <div class="mb-2">
-                                                    <label class="form-label">Image After</label>
-                                                    <input type="file" class="form-control" name="image_after" accept="image/*" capture="environment">
+                                                    <label class="form-label">Image</label>
+                                                    <input type="file" class="form-control" name="image" accept="image/*" capture="environment">
                                                 </div>
 
                                                 <input type="hidden" name="status" value="completed">
@@ -81,6 +79,11 @@
                 @endforeach
             </ul>
         @endif
+    </div>
+    <div class="ad-300x50 ad-300x50-fixed">
+        <a href="{{ route('patroll.scan') }}" class="btn btn-full btn-m rounded-s text-uppercase font-900 shadow-xl bg-highlight">
+            KEMBALI SCAN
+        </a>
     </div>
 
 </div>

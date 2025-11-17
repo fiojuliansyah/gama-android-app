@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Floor;
 use App\Models\Jobdesk;
 use App\Models\TaskPlanner;
+use App\Models\TaskProgress;
 use Illuminate\Http\Request;
 use App\Models\PatrollSession;
 use App\Models\SecurityPatroll;
@@ -104,52 +105,40 @@ class PatrollController extends Controller
     {
         $floor = Floor::findOrFail($id);
         $taskPlanners = TaskPlanner::where('floor_id', $id)->get();
-        return view('security-patrolls.detail-floor', compact('floor', 'taskPlanners'));
+
+        $currentSession = auth()->user()->patrollSessions()
+                                ->whereNull('end_time')
+                                ->latest()
+                                ->first();
+
+        return view('security-patrolls.detail-floor', compact('floor', 'taskPlanners', 'currentSession'));
     }
 
-    public function update(Request $request, TaskPlanner $task)
+    public function taskUpdate(Request $request, TaskPlanner $task)
     {
         $request->validate([
             'progress_description' => 'nullable|string',
-            'image_before' => 'nullable|image|max:2048',
-            'image_after' => 'nullable|image|max:2048',
-            'status' => 'required|in:pending,in_progress,completed',
-            'is_worked' => 'required|in:worked,not_worked',
+            'image' => 'nullable|image|max:2048',
+            'patroll_session_id' => 'required|exists:patroll_sessions,id'
         ]);
 
         $data = [
+            'user_id' => Auth::id(),
+            'floor_id' => $task->floor_id,
             'site_id' => $task->site_id,
-            'status' => $request->status,
-            'is_worked' => $request->is_worked,
-            'progress_description' => $request->progress_description,
-            'date' => now()->format('Y-m-d'),
-            'start_time' => $request->start_time ?? now()->format('H:i:s'),
-            'end_time' => $request->end_time ?? null,
+            'task_planner_id' => $task->id,
+            'name' => $task->name,
+            'description' => $request->progress_description,
+            'status' => 'reported', 
+            'patroll_session_id' => $request->patroll_session_id,
         ];
 
-        if ($request->hasFile('image_before')) {
-            $storageOption = $request->input('storage_option_before', 'local');
-            if ($storageOption === 's3') {
-                $path = $request->file('image_before')->store('task_progress', 's3');
-                $data['image_before_url'] = Storage::disk('s3')->url($path);
-            } else {
-                $path = $request->file('image_before')->store('task_progress', 'public');
-                $data['image_before_url'] = asset("storage/{$path}");
-            }
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('security_patroll', 'public');
+            $data['image_url'] = asset("storage/{$path}");
         }
 
-        if ($request->hasFile('image_after')) {
-            $storageOption = $request->input('storage_option_after', 'local');
-            if ($storageOption === 's3') {
-                $path = $request->file('image_after')->store('task_progress', 's3');
-                $data['image_after_url'] = Storage::disk('s3')->url($path);
-            } else {
-                $path = $request->file('image_after')->store('task_progress', 'public');
-                $data['image_after_url'] = asset("storage/{$path}");
-            }
-        }
-
-        TaskProgress::updateOrCreate(
+        SecurityPatroll::updateOrCreate(
             [
                 'task_planner_id' => $task->id,
                 'user_id' => Auth::id(),
