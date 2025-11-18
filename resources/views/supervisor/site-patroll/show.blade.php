@@ -1,22 +1,27 @@
-@extends('layouts.master')
+@extends('layouts.app')
 
 @section('content')
 
 <div class="header header-fixed header-logo-center">
-    <span class="header-title">Security Patroll</span>
+    <span class="header-title">{{ $site->name }}</span>
+    <a href="{{ route('home') }}" class="header-icon header-icon-1">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalTanggal" class="header-icon header-icon-4">
+        <i class="fas fa-calendar-alt"></i>
+    </a>
 </div>
 
 <div class="page-content pt-5">
 
-    {{-- FILTER SESSION --}}
     <div class="mb-4">
         <div class="content">
-            <form method="GET" action="{{ route('patroll.index') }}">
+            <form method="GET" action="{{ route('supervisor.site-patroll.show', $site->id) }}">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="mb-1 font-600">Filter Session</h5>
                     </div>
-
+                    <input type="hidden" name="date" value="{{ request('date') }}">
                     <div>
                         <select name="session_id"
                                 onchange="this.form.submit()"
@@ -88,16 +93,35 @@
                 </div>
 
             @endforeach
+        </div>
+    @endif
+</div>
+<!-- Modal Filter Tanggal -->
+<div class="modal fade" id="modalTanggal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded">
+
+            <form method="GET" action="{{ route('supervisor.site-patroll.show', $site->id) }}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Filter Tanggal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label class="form-label">Pilih Tanggal</label>
+                    <input type="date" name="date" class="form-control"
+                        value="{{ request('date', now()->toDateString()) }}">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Terapkan</button>
+                </div>
+
+            </form>
 
         </div>
-
-    @endif
-    <div class="ad-300x50 ad-300x50-fixed">
-        <a href="{{ route('patroll.scan') }}" class="btn btn-full btn-m rounded-s text-uppercase font-900 shadow-xl bg-highlight">
-            <i class="fas fa-plus">&nbsp;</i>Start Patroli
-        </a>
     </div>
-
 </div>
-
 @endsection

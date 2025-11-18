@@ -15,6 +15,9 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FindingsReportController;
 use App\Http\Controllers\FaceRecognitionController;
+use App\Http\Controllers\Supervisor\TeamController;
+use App\Http\Controllers\Supervisor\ChangeShiftController;
+use App\Http\Controllers\Supervisor\SitePatrollController;
 
 Route::get('/download', [HomeController::class, 'download'])->name('download');
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('privacy-policy');
@@ -106,4 +109,16 @@ Route::middleware('auth')->prefix('mobile')->group(function () {
     Route::get('/floor/{id}/patroll', [PatrollController::class, 'detailFloor'])->name('patroll.floor.detail');
     Route::post('/task-progress/{task}/update', [PatrollController::class, 'taskUpdate'])->name('patroll.task-progress.update');
 
+    Route::prefix('supervisor')->name('supervisor.')->group(function() {
+        Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+        Route::get('/teams/{id}', [TeamController::class, 'show'])->name('teams.show');
+        Route::put('/teams/{user}/resign', [TeamController::class, 'resign'])->name('teams.resign');
+
+        Route::get('/change-shift', [ChangeShiftController::class, 'index'])->name('change-shift.index');
+        Route::get('/change-shift/{shift}', [ChangeShiftController::class, 'show'])->name('change-shift.show');
+        Route::post('/change-shift/update-schedule', [ChangeShiftController::class, 'updateSchedule'])->name('change-shift.update-schedule');
+
+        Route::get('/site-patroll', [SitePatrollController::class, 'index'])->name('site-patroll.index');
+        Route::get('/site-patroll/{siteId}', [SitePatrollController::class, 'show'])->name('site-patroll.show');
+    });
 });

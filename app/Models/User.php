@@ -73,15 +73,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Site::class);
     }
-
-    // pivot supervisor
+    
     public function sites_leader()
     {
         return $this->belongsToMany(Site::class, 'user_has_sites', 'user_id', 'site_id')
             ->withTimestamps();
     }
 
-    // Optional helper supaya langsung dapat semua task
     public function allTaskPlanners()
     {
         return TaskPlanner::whereIn('site_id', $this->sites_leader->pluck('id'))->get();

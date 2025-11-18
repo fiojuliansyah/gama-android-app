@@ -66,4 +66,9 @@ class Site extends Model
     {
         return $this->hasMany(SecurityPatroll::class);
     }
+
+    public function shifts()
+    {
+        return $this->hasMany(Shift::class);
+    }
 }

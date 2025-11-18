@@ -5,7 +5,7 @@
             <div class="d-flex">
                 <div class="align-self-center">
                     <a href="{{ route('setting') }}">
-                        <img src="{{ Auth::user()->profile->avatar_url }}"
+                        <img src="{{ Auth::user()->profile->avatar_url ?? '/assets/images/avatars/2m.png' }}"
                             class="rounded-circle" width="43">
                     </a>
                 </div>
@@ -93,7 +93,7 @@
                             @if ($schedule->type == 'off')
                                 <h6 class="text-center">LIBUR</h6>
                             @else
-                                <h3 class="text-center">{{ $schedule->clock_in ?? '' }} - {{ $schedule->clock_out ?? '' }}
+                                <h3 class="text-center">{{ \Carbon\Carbon::parse($schedule->clock_in)->format('H:i') ?? '' }} - {{ \Carbon\Carbon::parse($schedule->clock_out)->format('H:i') ?? '' }}
                                 </h3>
                             @endif
                         @else
@@ -221,130 +221,99 @@
                     <span class="font-10 font-500 color-theme d-block">More</span>
                 </div>
             </div> --}}
-            <div class="row"> 
-                <span href="#" class="color-theme font-800 font-13 text-uppercase px-3">
-                    Supervisor Mode
-                </span>
-                <div class="mt-3">
-                    <div class="list-group list-group-flush">
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-users"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Kelola Tim</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Atur & monitor anggota tim</p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-    
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Aproval Cuti</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Konfirmasi atau tolak pengajuan cuti
-                                </p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-    
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Aproval Ijin</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Konfirmasi atau tolak pengajuan ijin
-                                </p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-    
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-clock" aria-hidden="true"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Aproval Lembur</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Review & approve jam lembur</p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-    
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-clock" aria-hidden="true"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Aproval Berita Acara</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Review & approve berita acara</p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-    
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-exchange" aria-hidden="true"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Tukar Jadwal Tim</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Atur & Setujui permintaan tukar jadwal
-                                </p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-    
-                        <a href="#"
-                            class="list-group-item px-1 d-flex align-items-center p-3">
-                            <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
-                                <i class="fa fa-line-chart" aria-hidden="true"></i>
-                            </div>
-    
-                            <div class="ms-3">
-                                <h4 class="mb-0">Report Patroli</h4>
-                                <p class="lh-1 text-secondary" style="font-size:11px;">Laporan performa & patroli</p>
-                            </div>
-    
-                            <div class="ms-auto">
-                                <i class="fa fa-angle-right"></i>
-                            </div>
-                        </a>
-                        <li class="list-group-item"></li>
+            @if (Auth::user()->sites_leader->isNotEmpty())
+                <div class="row"> 
+                    <span href="#" class="color-theme font-800 font-13 text-uppercase px-3">
+                        Supervisor Mode
+                    </span>
+                    <div class="mt-3">
+                        <div class="list-group list-group-flush">
+                            <a href="{{ route('supervisor.teams.index') }}"
+                                class="list-group-item px-1 d-flex align-items-center p-3">
+                                <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
+                                    <i class="fa fa-users"></i>
+                                </div>
+        
+                                <div class="ms-3">
+                                    <h4 class="mb-0">Kelola Tim</h4>
+                                    <p class="lh-1 text-secondary" style="font-size:11px;">Atur & monitor anggota tim</p>
+                                </div>
+        
+                                <div class="ms-auto">
+                                    <i class="fa fa-angle-right"></i>
+                                </div>
+                            </a>
+        
+                            <a href="#"
+                                class="list-group-item px-1 d-flex align-items-center p-3">
+                                <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                </div>
+        
+                                <div class="ms-3">
+                                    <h4 class="mb-0">Aproval Ijin</h4>
+                                    <p class="lh-1 text-secondary" style="font-size:11px;">Konfirmasi atau tolak pengajuan ijin
+                                    </p>
+                                </div>
+        
+                                <div class="ms-auto">
+                                    <i class="fa fa-angle-right"></i>
+                                </div>
+                            </a>
+        
+                            <a href="#"
+                                class="list-group-item px-1 d-flex align-items-center p-3">
+                                <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
+                                    <i class="fa fa-clock" aria-hidden="true"></i>
+                                </div>
+        
+                                <div class="ms-3">
+                                    <h4 class="mb-0">Aproval Lembur</h4>
+                                    <p class="lh-1 text-secondary" style="font-size:11px;">Review & approve jam lembur</p>
+                                </div>
+        
+                                <div class="ms-auto">
+                                    <i class="fa fa-angle-right"></i>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('supervisor.change-shift.index') }}"
+                                class="list-group-item px-1 d-flex align-items-center p-3">
+                                <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
+                                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                                </div>
+        
+                                <div class="ms-3">
+                                    <h4 class="mb-0">Tukar Jadwal Tim</h4>
+                                    <p class="lh-1 text-secondary" style="font-size:11px;">Atur & Setujui permintaan tukar jadwal
+                                    </p>
+                                </div>
+        
+                                <div class="ms-auto">
+                                    <i class="fa fa-angle-right"></i>
+                                </div>
+                            </a>
+        
+                            <a href="{{ route('supervisor.site-patroll.index') }}"
+                                class="list-group-item px-1 d-flex align-items-center p-3">
+                                <div class="rounded-3 bg-blue-dark-supervisor size-icon-supervisor shadow-sm">
+                                    <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                </div>
+        
+                                <div class="ms-3">
+                                    <h4 class="mb-0">Report Patroli</h4>
+                                    <p class="lh-1 text-secondary" style="font-size:11px;">Laporan performa & patroli</p>
+                                </div>
+        
+                                <div class="ms-auto">
+                                    <i class="fa fa-angle-right"></i>
+                                </div>
+                            </a>
+                            <li class="list-group-item"></li>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 @endsection

@@ -11,7 +11,7 @@
     <div class="content">
         <div class="d-flex">
             <div>
-                <img src="{{ Auth::user()->profile->avatar_url ?? '/mobile/images/avatars/2m.png' }}" width="50" class="me-3 bg-highlight rounded-xl">
+                <img src="{{ Auth::user()->profile->avatar_url ?? '/assets/images/avatars/2m.png' }}" width="50" class="me-3 bg-highlight rounded-xl">
             </div>
             <div>
                 <h1 class="mb-0 pt-1">{{ Auth::user()->name }}</h1>

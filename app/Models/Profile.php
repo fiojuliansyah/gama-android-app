@@ -44,6 +44,11 @@ class Profile extends Model
         'account_number',
     ];
 
+    protected $casts = [
+        'join_date' => 'date',
+        'resign_date' => 'date',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
