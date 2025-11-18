@@ -125,7 +125,7 @@ class PatrollController extends Controller
     {
         $request->validate([
             'progress_description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable',
             'patroll_session_id' => 'required|exists:patroll_sessions,id'
         ]);
 
