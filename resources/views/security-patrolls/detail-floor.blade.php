@@ -118,32 +118,50 @@
 
 @push('js')
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const modal = document.getElementById('progressModal{{ $task->id }}');
+document.addEventListener("DOMContentLoaded", function() {
+    const modals = document.querySelectorAll('.modal.fade');
+    modals.forEach(modal => {
         modal.addEventListener('shown.bs.modal', function () {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(stream => {
-                    document.getElementById("cameraStream{{ $task->id }}").srcObject = stream;
-                });
+            const video = modal.querySelector('video');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                    .then(stream => {
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(err => {
+                        alert("Tidak dapat membuka kamera: " + err);
+                    });
+            }
+        });
+
+        modal.addEventListener('hidden.bs.modal', function () {
+            const video = modal.querySelector('video');
+            if(video.srcObject){
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
         });
     });
+});
 
-    function takePhoto(id) {
-        const video = document.getElementById("cameraStream" + id);
-        const canvas = document.getElementById("captureCanvas" + id);
-        const preview = document.getElementById("photoPreview" + id);
-        const base64Input = document.getElementById("imageBase64" + id);
+function takePhoto(id) {
+    const video = document.getElementById("cameraStream" + id);
+    const canvas = document.getElementById("captureCanvas" + id);
+    const preview = document.getElementById("photoPreview" + id);
+    const base64Input = document.getElementById("imageBase64" + id);
 
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        const imageData = canvas.toDataURL("image/jpeg", 0.8);
+    const imageData = canvas.toDataURL("image/jpeg", 0.8);
 
-        base64Input.value = imageData;
-        preview.src = imageData;
-        preview.style.display = "block";
-    }
+    base64Input.value = imageData;
+    preview.src = imageData;
+    preview.style.display = "block";
+}
 </script>
 @endpush
+
