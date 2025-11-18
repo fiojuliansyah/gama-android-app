@@ -125,7 +125,7 @@ class PatrollController extends Controller
     {
         $request->validate([
             'progress_description' => 'nullable|string',
-            'image' => 'nullable',
+            'image_base64' => 'nullable|string',
             'patroll_session_id' => 'required|exists:patroll_sessions,id'
         ]);
 
@@ -136,13 +136,19 @@ class PatrollController extends Controller
             'task_planner_id' => $task->id,
             'name' => $task->name,
             'description' => $request->progress_description,
-            'status' => 'reported', 
+            'status' => 'reported',
             'patroll_session_id' => $request->patroll_session_id,
         ];
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('security_patroll', 'public');
-            $data['image_url'] = asset("storage/{$path}");
+        if ($request->image_base64) {
+            $image = $request->image_base64;
+            $image = str_replace('data:image/jpeg;base64,', '', $image);
+            $image = str_replace(' ', '+', $image);
+
+            $imageName = 'patrol_' . time() . '.jpg';
+            Storage::disk('public')->put('security_patroll/' . $imageName, base64_decode($image));
+
+            $data['image_url'] = asset('storage/security_patroll/' . $imageName);
         }
 
         SecurityPatroll::updateOrCreate(
